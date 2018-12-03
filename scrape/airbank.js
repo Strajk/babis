@@ -1,51 +1,13 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-console */
-/* eslint-disable no-unused-vars */
-
-require('dotenv').config();
-
-const Promise = require('bluebird');
-const webdriverio = require('webdriverio');
-const selenium = require('selenium-standalone');
 const moment = require('moment');
-const mkdirp = require('mkdirp');
 
-const install = Promise.promisify(selenium.install);
-
-const DRIVERS = {
-  chrome: {
-    version: '2.40',
-    arch: process.arch,
-    baseURL: 'https://chromedriver.storage.googleapis.com',
-  },
-};
-
-const OUTPUT_DIR = `${process.cwd}/output`;
-mkdirp.sync(OUTPUT_DIR);
-
-const SELENIUM_VERSION = '3.14.0';
-
-const OPTIONS = {
-  desiredCapabilities: {
-    browserName: 'chrome',
-    chromeOptions: {
-      prefs: {
-        'download.default_directory': OUTPUT_DIR,
-      },
-    },
-  },
-  // logLevel: 'verbose',
-  waitforTimeout: 10 * 1000,
-};
-
-
-async function scrape({
+async function scrape(client, {
   user,
   pass,
   from = moment().subtract(1, 'month').format(),
   to = moment().format(),
 }) {
-  const client = webdriverio.remote(OPTIONS);
-
   const fromParsed = moment(from).format('DD.MM.YYYY');
   const toParsed = moment(to).format('DD.MM.YYYY');
 
@@ -63,58 +25,52 @@ async function scrape({
   await client.click('span=Účty a karty');
   await client.waitForVisible('.cmpLoaderOver', undefined, true);
 
-  // TODO: Support more accounts
+  /*
+    Would rather use, but I was unable to make it work
+    It kept clicking on first tab :(
+    const accounts = await client.elements('#jsLayoutAccounts .tab');
+    for (const account of accounts.value) {
+      await client.elementIdClick(account.ELEMENT);
+  */
 
-  const balance = await client.getText('.numberPrimary');
-  // 12 345,67 CZK => 12345,67CZK
-  const balanceClean = balance.replace(/\s/g, '');
+  const accounts = await client.elements('#jsLayoutAccounts .tab');
 
-  console.log('💰💰💰 BALANCE', balanceClean);
+  // eslint-disable-next-line guard-for-in, no-restricted-syntax, no-plusplus
+  for (let i = 1; i <= accounts.value.length; i++) {
+    await client.click(`#jsLayoutAccounts .tab:nth-child(${i})`);
+    await client.waitForVisible('.cmpLoaderOver', undefined, true);
 
-  await client.click('span=Historie plateb');
-  await client.waitForVisible('.cmpLoaderOver', undefined, true);
+    const balance = await client.getText('.numberPrimary');
+    // 12 345,67 CZK => 12345,67CZK
+    const balanceClean = balance.replace(/\s/g, '');
 
-  await client.click('span=Podrobné vyhledávání');
-  await client.waitForVisible('.cmpLoaderOver', undefined, true);
+    console.log('💰💰💰 BALANCE', balanceClean);
 
-  await client.setValue('[name="stateOrForm:formContent:dateFrom:componentWrapper:component"]', fromParsed);
+    await client.click('span=Historie plateb');
+    await client.waitForVisible('.cmpLoaderOver', undefined, true);
 
-  await client.setValue('[name="stateOrForm:formContent:dateTo:componentWrapper:component"]', toParsed);
+    await client.click('span=Podrobné vyhledávání');
+    await client.waitForVisible('.cmpLoaderOver', undefined, true);
 
-  await client.keys('Enter');
-  await client.waitForVisible('.cmpLoaderOver', undefined, true);
+    await client.setValue('[name="stateOrForm:formContent:dateFrom:componentWrapper:component"]', fromParsed);
 
-  // TODO: Assert results
+    await client.setValue('[name="stateOrForm:formContent:dateTo:componentWrapper:component"]', toParsed);
 
-  await client.click('span=Exportovat');
+    await client.keys('Enter');
+    await client.waitForVisible('.cmpLoaderOver', undefined, true);
 
-  await client.waitForExist('span=Exportní soubor jsme vytvořili', 10 * 1000);
+    // TODO: Assert results
+
+    await client.click('span=Exportovat');
+
+    await client.waitForExist('span=Exportní soubor jsme vytvořili', 10 * 1000);
+    await client.pause(500);
+    await client.click('.ui-dialog-titlebar-close');
+    await client.waitForVisible('.cmpLoaderOver', undefined, true);
+  }
+
 
   return client.end();
 }
 
-async function main(params) {
-  await install({
-    version: SELENIUM_VERSION,
-    baseURL: 'https://selenium-release.storage.googleapis.com',
-    drivers: DRIVERS,
-    logger: (msg) => { console.log(msg); },
-  });
-
-  await selenium.start({
-    version: SELENIUM_VERSION,
-    drivers: DRIVERS,
-    spawnOptions: {
-      stdio: 'inherit',
-    },
-  }, async (err) => {
-    if (err) console.log(err);
-    await scrape({
-      user: process.env.AIRBANK_USER,
-      pass: process.env.AIRBANK_PASS,
-    });
-    console.log('🎉 Done');
-  });
-}
-
-main();
+module.exports = scrape;
