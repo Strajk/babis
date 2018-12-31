@@ -73,4 +73,34 @@ async function scrape(client, {
   return client.end();
 }
 
-module.exports = scrape;
+function normalize(input) {
+  return input.map((x) => {
+    let desc = x['Název protistrany'];
+    if (x['Typ úhrady'] !== 'Platba kartou') {
+      desc += ` | ${x['Typ úhrady']}`;
+    }
+
+    if (x['Poznámka pro mne']) {
+      desc += ` | ${x['Poznámka pro mne']}`;
+    }
+
+    if (x['Zpráva pro příjemce']) {
+      desc += ` | ${x['Zpráva pro příjemce']}`;
+    }
+
+    if (x['Původní měna úhrady'] !== 'CZK') {
+      desc += ` (${-parseFloat(x['Původní částka úhrady'])} ${x['Původní měna úhrady']})`;
+    }
+
+    return {
+      date: moment(x['Datum provedení'], 'DD/MM/YYYY').format('YYYY-MM-DD'),
+      description: desc,
+      amount: -parseFloat(x['Částka v měně účtu']),
+    };
+  });
+}
+
+module.exports = {
+  scrape,
+  normalize,
+};

@@ -4,6 +4,10 @@ require('dotenv').config();
 
 const Promise = require('bluebird');
 const webdriverio = require('webdriverio');
+const parseCsv = require('csv-parse/lib/sync');
+const stringifyCsv = require('csv-stringify/lib/sync');
+const glob = require('glob');
+const fs = require('fs');
 const selenium = require('selenium-standalone');
 
 const mkdirp = require('mkdirp');
@@ -56,16 +60,37 @@ async function main(params) {
   }, async (err) => {
     if (err) console.log(err);
     const client = webdriverio.remote(OPTIONS);
-    await airbank(client, {
+    await airbank.scrape(client, {
       user: process.env.AIRBANK_USER,
       pass: process.env.AIRBANK_PASS,
     });
     // Not ready for it's prime time yet
-    // await csob(client, {
+    // await csob.scrape(client, {
     //   user: process.env.CSOB_USER,
     //   pass: process.env.CSOB_PASS,
     // });
+
+    // TODO: Nicer
+    // eslint-disable-next-line no-use-before-define
+    normalize();
     console.log('🎉 Done');
+  });
+}
+
+function normalize() {
+  glob('output/*.csv', {}, (er, files) => {
+    files.forEach((file) => {
+      const opened = fs.readFileSync(file, 'utf-8');
+      const parsed = parseCsv(opened, { columns: true });
+      let normalized;
+      if (file.includes('airbank')) {
+        normalized = airbank.normalize(parsed);
+      }
+      // const string = stringifyCsv(normalized, { header: true, quoted: true });
+      // TODO: No not replace
+      const string = stringifyCsv(normalized, { header: false, quoted: false, delimiter: '\t' });
+      fs.writeFileSync(file, string);
+    });
   });
 }
 

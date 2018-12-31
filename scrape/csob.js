@@ -40,4 +40,6 @@ async function scrape(client, {
   return client.end();
 }
 
-module.exports = scrape;
+module.exports = {
+  scrape,
+};
