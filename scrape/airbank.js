@@ -5,7 +5,7 @@ const moment = require('moment');
 async function scrape(client, {
   user,
   pass,
-  from = moment().subtract(1, 'month').format(),
+  from = moment().subtract(2, 'month').format(),
   to = moment().format(),
 }) {
   const fromParsed = moment(from).format('DD.MM.YYYY');
