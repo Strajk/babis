@@ -7,7 +7,7 @@
   "main": "index.js",
   "dependencies": {
     "bluebird": "~3.5.3",
-    "dotenv": "~6.1.0",
+    "dotenv": "~8.2.0",
     "mkdirp": "~0.5.1",
     "moment": "~2.22.2",
     "selenium-standalone": "~6.15.4",
