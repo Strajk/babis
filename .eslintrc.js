@@ -1,12 +1,12 @@
 module.exports = {
-  extends: "airbnb-base",
+  extends: "strajk",
   overrides: [
     {
       files: [
-        "**/*.test.js"
+        "**/*.test.js",
       ],
       env: {
-        jest: true
+        jest: true,
       },
       // Can't extend in overrides: https://github.com/eslint/eslint/issues/8813
       // "extends": ["plugin:jest/recommended"]
@@ -16,9 +16,8 @@ module.exports = {
         "jest/no-focused-tests": "error",
         "jest/no-identical-title": "error",
         "jest/prefer-to-have-length": "warn",
-        "jest/valid-expect": "error"
-      }
-    }
+        "jest/valid-expect": "error",
+      },
+    },
   ],
-  
-};
+}

@@ -6,21 +6,22 @@
   "author": "Strajk <strajk@me.com>",
   "main": "index.js",
   "dependencies": {
-    "bluebird": "~3.5.3",
-    "csv-parse": "^4.2.0",
-    "csv-stringify": "latest",
-    "dotenv": "~6.1.0",
-    "glob": "^7.1.3",
-    "mkdirp": "^0.5.1",
-    "moment": "~2.22.2",
-    "selenium-standalone": "~6.15.4",
-    "webdriverio": "~4.14.1"
+    "@wdio/sync": "~6.1.8",
+    "bluebird": "~3.7.2",
+    "clipboardy": "~2.3.0",
+    "csv-parse": "~4.10.1",
+    "csv-stringify": "~5.5.0",
+    "dotenv": "~8.2.0",
+    "glob": "~7.1.6",
+    "iconv-lite": "~0.5.1",
+    "mkdirp": "~1.0.4",
+    "moment": "~2.26.0",
+    "selenium-standalone": "~6.17.0",
+    "webdriverio": "~6.1.12"
   },
   "devDependencies": {
-    "eslint": "~5.9.0",
-    "eslint-config-airbnb-base": "~13.1.0",
-    "eslint-plugin-import": "~2.14.0",
-    "eslint-plugin-jest": "^22.1.2",
-    "jest": "^23.6.0"
+    "eslint": "~7.1.0",
+    "eslint-config-strajk": "~0.0.6",
+    "jest": "~26.0.1"
   }
 }
