@@ -44,7 +44,7 @@ async function scrape (client, {
     const accounts = client.elements('#jsLayoutAccounts .tab');
     for (const account of accounts.value) {
       client.elementIdClick(account.ELEMENT);
-  */
+    */
 
     const accounts = client.$$("#jsLayoutAccounts .tab")
 
@@ -77,7 +77,7 @@ async function scrape (client, {
 
       client.$("span=Exportní soubor jsme vytvořili").waitForExist(10 * 1000)
       client.pause(3000) // TODO: Consider removing after being pretty stable
-      client.$("a[href=ExportCsv]").click()
+      client.$(".ui-dialog .cmpDialogButtons a.ui-button").click()
       client.pause(1000) // TODO: Consider removing after being pretty stable
       client.$(".ui-dialog-titlebar-close").click()
       client.$(".cmpLoaderOver").waitForDisplayed({ reverse: true })
