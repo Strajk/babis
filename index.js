@@ -22,6 +22,7 @@ const OUTPUT_DIR = `${process.cwd()}/output`;
   airbank.scrape(client, {
     user: process.env.AIRBANK_USER,
     pass: process.env.AIRBANK_PASS,
+    from: "2020-08-01",
     birthdate: {
       day: process.env.BIRTHDAY_DAY,
       month: process.env.BIRTHDAY_MONTH,
@@ -30,10 +31,10 @@ const OUTPUT_DIR = `${process.cwd()}/output`;
   })
 
   // Not ready for it's prime time yet
-  await csob.scrape(client, {
-    user: process.env.CSOB_USER,
-    pass: process.env.CSOB_PASS,
-  })
+  // await csob.scrape(client, {
+  //   user: process.env.CSOB_USER,
+  //   pass: process.env.CSOB_PASS,
+  // })
 
   normalize()
   console.log("🎉 Done")
