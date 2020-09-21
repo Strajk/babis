@@ -90,7 +90,10 @@ async function scrape (client, {
 function normalize (input) {
   return input.map((x) => {
     let desc = x["Název protistrany"]
-    if (x["Typ úhrady"] !== "Platba kartou") {
+    if (
+      x["Typ úhrady"] !== "Platba kartou" &&
+      x["Typ úhrady"] !== "Karetní transakce (nezaúčtováno)"
+    ) {
       desc += ` | ${x["Typ úhrady"]}`
     }
 
